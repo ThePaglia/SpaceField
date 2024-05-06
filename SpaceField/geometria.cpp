@@ -1,46 +1,175 @@
 #include "Strutture.h"
 #include "Lib.h"
 
-void crea_cubo(Mesh* mesh)
+void crea_skybox(Mesh* mesh, vec4 colore)
 {
-	mesh->vertici.push_back(vec3(-1.0, -1.0, 1.0));
-	mesh->colori.push_back(vec4(1.0, 0.0, 0.0, 0.5));
-	mesh->vertici.push_back(vec3(1.0, -1.0, 1.0));
-	mesh->colori.push_back(vec4(0.0, 1.0, 0.0, 0.5));
-	mesh->vertici.push_back(vec3(1.0, 1.0, 1.0));
-	mesh->colori.push_back(vec4(0.0, 0.0, 1.0, 0.5));
-	mesh->vertici.push_back(vec3(-1.0, 1.0, 1.0));
-	mesh->colori.push_back(vec4(1.0, 0.0, 1.0, 0.5));
-	// back
-	mesh->vertici.push_back(vec3(-1.0, -1.0, -1.0));
-	mesh->colori.push_back(vec4(1.0, 1.0, 1.0, 0.5));
-	mesh->vertici.push_back(vec3(1.0, -1.0, -1.0));
-	mesh->colori.push_back(vec4(1.0, 1.0, 1.0, 0.5));
-	mesh->vertici.push_back(vec3(1.0, 1.0, -1.0));
-	mesh->colori.push_back(vec4(1.0, 1.0, 1.0, 0.5));
-	mesh->vertici.push_back(vec3(-1.0, 1.0, -1.0));
-	mesh->colori.push_back(vec4(1.0, 1.0, 1.0, 0.5));
+	// Vertici del fronte
+	mesh->vertici.push_back(vec3(-1.0f, -1.0f, 1.0f));
+	mesh->colori.push_back(vec4(1.0f, 0.0f, 0.0f, 0.5f));
+	mesh->vertici.push_back(vec3(1.0f, -1.0f, 1.0f));
+	mesh->colori.push_back(vec4(0.0f, 1.0f, 0.0f, 0.5f));
+	mesh->vertici.push_back(vec3(1.0f, 1.0f, 1.0f));
+	mesh->colori.push_back(vec4(0.0f, 0.0f, 1.0f, 0.5f));
+	mesh->vertici.push_back(vec3(-1.0f, 1.0f, 1.0f));
+	mesh->colori.push_back(vec4(1.0f, 0.0f, 1.0f, 0.5f));
+	// Vertici del retro
+	mesh->vertici.push_back(vec3(-1.0f, -1.0f, -1.0f));
+	mesh->colori.push_back(vec4(1.0f, 1.0f, 1.0f, 0.5f));
+	mesh->vertici.push_back(vec3(1.0f, -1.0f, -1.0f));
+	mesh->colori.push_back(vec4(1.0f, 1.0f, 1.0f, 0.5f));
+	mesh->vertici.push_back(vec3(1.0f, 1.0f, -1.0f));
+	mesh->colori.push_back(vec4(1.0f, 1.0f, 1.0f, 0.5f));
+	mesh->vertici.push_back(vec3(-1.0f, 1.0f, -1.0f));
+	mesh->colori.push_back(vec4(1.0f, 1.0f, 1.0f, 0.5f));
+	// Vertici del centro
+	mesh->vertici.push_back(vec3(0.0f, 0.0f, 0.0f));
+	mesh->colori.push_back(vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	mesh->ancora_obj = (vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-	mesh->vertici.push_back(vec3(0.0, 0.0, 0.0));
-	mesh->colori.push_back(vec4(0.0, 1.0, 0.0, 1.0));
-	mesh->ancora_obj = (vec4(0.0, 0.0, 0.0, 1.0));
-
-	mesh->indici.push_back(0); mesh->indici.push_back(1); mesh->indici.push_back(2);
-	mesh->indici.push_back(2); mesh->indici.push_back(3); mesh->indici.push_back(0);
-	mesh->indici.push_back(1); mesh->indici.push_back(5); mesh->indici.push_back(6);
-	mesh->indici.push_back(6); mesh->indici.push_back(2); mesh->indici.push_back(1);
-	mesh->indici.push_back(7); mesh->indici.push_back(6); mesh->indici.push_back(5);
-	mesh->indici.push_back(5); mesh->indici.push_back(4); mesh->indici.push_back(7);
-	mesh->indici.push_back(4); mesh->indici.push_back(0); mesh->indici.push_back(3);
-	mesh->indici.push_back(3); mesh->indici.push_back(7); mesh->indici.push_back(4);
-	mesh->indici.push_back(4); mesh->indici.push_back(5); mesh->indici.push_back(1);
-	mesh->indici.push_back(1); mesh->indici.push_back(0); mesh->indici.push_back(4);
-	mesh->indici.push_back(3); mesh->indici.push_back(2); mesh->indici.push_back(6);
-	mesh->indici.push_back(6); mesh->indici.push_back(7); mesh->indici.push_back(3);
-	int nv = mesh->vertici.size();
-
-	mesh->indici.push_back(nv - 1);
+	// Inserimento dei vertici
+	mesh->indici.push_back(0);
+	mesh->indici.push_back(1);
+	mesh->indici.push_back(2);
+	mesh->indici.push_back(2);
+	mesh->indici.push_back(3);
+	mesh->indici.push_back(0);
+	mesh->indici.push_back(1);
+	mesh->indici.push_back(5);
+	mesh->indici.push_back(6);
+	mesh->indici.push_back(6);
+	mesh->indici.push_back(2);
+	mesh->indici.push_back(1);
+	mesh->indici.push_back(7);
+	mesh->indici.push_back(6);
+	mesh->indici.push_back(5);
+	mesh->indici.push_back(5);
+	mesh->indici.push_back(4);
+	mesh->indici.push_back(7);
+	mesh->indici.push_back(4);
+	mesh->indici.push_back(0);
+	mesh->indici.push_back(3);
+	mesh->indici.push_back(3);
+	mesh->indici.push_back(7);
+	mesh->indici.push_back(4);
+	mesh->indici.push_back(4);
+	mesh->indici.push_back(5);
+	mesh->indici.push_back(1);
+	mesh->indici.push_back(1);
+	mesh->indici.push_back(0);
+	mesh->indici.push_back(4);
+	mesh->indici.push_back(3);
+	mesh->indici.push_back(2);
+	mesh->indici.push_back(6);
+	mesh->indici.push_back(6);
+	mesh->indici.push_back(7);
+	mesh->indici.push_back(3);
 }
+// Metodo che crea un cubo
+void crea_cubo(Mesh* mesh, vec4 colore) {
+	// Vertici del fronte
+	mesh->vertici.push_back(vec3(-0.5f, -0.5f, 0.5f));
+	mesh->colori.push_back(vec4(1.0f, 0.0f, 0.0f, 0.5f));
+	mesh->vertici.push_back(vec3(0.5f, -0.5f, 0.5f));
+	mesh->colori.push_back(vec4(0.0f, 1.0f, 0.0f, 0.5f));
+	mesh->vertici.push_back(vec3(0.5f, 0.5f, 0.5f));
+	mesh->colori.push_back(vec4(0.0f, 0.0f, 1.0f, 0.5f));
+	mesh->vertici.push_back(vec3(-0.5f, 0.5f, 0.5f));
+	mesh->colori.push_back(vec4(1.0f, 0.0f, 1.0f, 0.5f));
+
+	// Calcolo delle normali del fronte
+	vec3 front_normal = normalize(cross(mesh->vertici[1] - mesh->vertici[0], mesh->vertici[2] - mesh->vertici[0]));
+
+	// Inserimento delle normali
+	for (int i = 0; i < 4; ++i) {
+		mesh->normali.push_back(front_normal);
+	}
+
+	// Vertici del retro
+	mesh->vertici.push_back(vec3(-0.5f, -0.5f, -0.5f));
+	mesh->colori.push_back(vec4(1.0f, 1.0f, 1.0f, 0.5f));
+	mesh->vertici.push_back(vec3(0.5f, -0.5f, -0.5f));
+	mesh->colori.push_back(vec4(1.0f, 1.0f, 1.0f, 0.5f));
+	mesh->vertici.push_back(vec3(0.5f, 0.5f, -0.5f));
+	mesh->colori.push_back(vec4(1.0f, 1.0f, 1.0f, 0.5f));
+	mesh->vertici.push_back(vec3(-0.5f, 0.5f, -0.5f));
+	mesh->colori.push_back(vec4(1.0f, 1.0f, 1.0f, 0.5f));
+
+	// Calcolo delle normali del retro
+	vec3 back_normal = -front_normal;
+
+	// Inserimento delle normali
+	for (int i = 0; i < 4; ++i) {
+		mesh->normali.push_back(back_normal);
+	}
+
+	// Coordinata di texture per il fronte
+	mesh->texCoords.push_back(vec2(0.0f, 0.0f));
+	mesh->texCoords.push_back(vec2(1.0f, 0.0f));
+	mesh->texCoords.push_back(vec2(1.0f, 1.0f));
+	mesh->texCoords.push_back(vec2(0.0f, 1.0f));
+
+	// Coordinata di texture per il retro
+	mesh->texCoords.push_back(vec2(1.0f, 0.0f));
+	mesh->texCoords.push_back(vec2(0.0f, 0.0f));
+	mesh->texCoords.push_back(vec2(0.0f, 1.0f));
+	mesh->texCoords.push_back(vec2(1.0f, 1.0f));
+
+	// Coordinata di texture per la parte destra
+	mesh->texCoords.push_back(vec2(1.0f, 0.0f));
+	mesh->texCoords.push_back(vec2(0.0f, 0.0f));
+	mesh->texCoords.push_back(vec2(0.0f, 1.0f));
+	mesh->texCoords.push_back(vec2(1.0f, 1.0f));
+
+	// Coordinata di texture per la parte sinistra
+	mesh->texCoords.push_back(vec2(0.0f, 0.0f));
+	mesh->texCoords.push_back(vec2(1.0f, 0.0f));
+	mesh->texCoords.push_back(vec2(1.0f, 1.0f));
+	mesh->texCoords.push_back(vec2(0.0f, 1.0f));
+
+	// Vertici del centro
+	mesh->vertici.push_back(vec3(0.0f, 0.0f, 0.0f));
+	mesh->colori.push_back(vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	mesh->ancora_obj = (vec4(0.0f, 0.3f, 0.0f, 1.0f));
+
+	// Inserimento dei vertici
+	mesh->indici.push_back(0);
+	mesh->indici.push_back(1);
+	mesh->indici.push_back(2);
+	mesh->indici.push_back(2);
+	mesh->indici.push_back(3);
+	mesh->indici.push_back(0);
+	mesh->indici.push_back(1);
+	mesh->indici.push_back(5);
+	mesh->indici.push_back(6);
+	mesh->indici.push_back(6);
+	mesh->indici.push_back(2);
+	mesh->indici.push_back(1);
+	mesh->indici.push_back(7);
+	mesh->indici.push_back(6);
+	mesh->indici.push_back(5);
+	mesh->indici.push_back(5);
+	mesh->indici.push_back(4);
+	mesh->indici.push_back(7);
+	mesh->indici.push_back(4);
+	mesh->indici.push_back(0);
+	mesh->indici.push_back(3);
+	mesh->indici.push_back(3);
+	mesh->indici.push_back(7);
+	mesh->indici.push_back(4);
+	mesh->indici.push_back(4);
+	mesh->indici.push_back(5);
+	mesh->indici.push_back(1);
+	mesh->indici.push_back(1);
+	mesh->indici.push_back(0);
+	mesh->indici.push_back(4);
+	mesh->indici.push_back(3);
+	mesh->indici.push_back(2);
+	mesh->indici.push_back(6);
+	mesh->indici.push_back(6);
+	mesh->indici.push_back(7);
+	mesh->indici.push_back(3);
+}
+
 void crea_piramide(Mesh* mesh)
 {
 	mesh->vertici.push_back(vec3(-1.0, 0.0, 1.0));

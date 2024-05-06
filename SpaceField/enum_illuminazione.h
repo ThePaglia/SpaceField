@@ -1,11 +1,10 @@
 typedef enum
 {
-	GOURAUD,
+	NO_ILLUMINATION,
 	PHONG,
 	BLINN,
-	TOON,
-	PASS_THROUGH
-} ShadingType;
+} IlluminationType;
+
 typedef enum
 {
 	RED_PLASTIC,
@@ -18,16 +17,8 @@ typedef enum
 
 typedef enum
 {
-	NONE,
-	GOURAD_SHADING,
+	NO_SHADER,
+	TEXTURE,
 	PHONG_SHADING,
-	NO_TEXTURE,
-	WAVE
-} ShaderOption;
-typedef enum
-{
-	WIRE_FRAME,
-	FACE_FILL,
-	CULLING_ON,
-	CULLING_OFF,
-} MenuOption;
+	INTERPOLATE_SHADING,
+} ShaderType;

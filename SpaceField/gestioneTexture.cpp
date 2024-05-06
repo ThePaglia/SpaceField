@@ -14,7 +14,7 @@ unsigned int loadTexture(char const* path, int flip)
 	if (data)
 	{
 		printf("Numero di canali %d ", nrComponents);
-		GLenum format;
+		GLenum format{};
 		if (nrComponents == 1)
 			format = GL_RED;
 		else if (nrComponents == 3)

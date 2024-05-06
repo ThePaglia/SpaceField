@@ -28,8 +28,9 @@ typedef struct
 	GLuint EBO_indici;
 	GLuint VBO_coord_texture;
 	string nome;
-	ShadingType shading;
+	IlluminationType illumination;
 	MaterialType material;
+	ShaderType shader;
 	vec4 ancora_obj;
 	vec4 ancora_world;
 } Mesh;
@@ -43,14 +44,14 @@ typedef struct
 	vector<vec2> texCoords;
 	mat4 ModelM;
 	int sceltaVS;
-	int sceltaFS;
 	GLuint VAO;
 	GLuint VBO_G;
 	GLuint VBO_C;
 	GLuint VBO_normali;
 	GLuint EBO_indici;
 	GLuint VBO_coord_texture;
-	ShadingType shading;
+	IlluminationType illumination;
+	ShaderType shader;
 	Material materiale;
 	string nome;
 	vec4 ancora_obj;
@@ -85,8 +86,12 @@ struct Character
 typedef struct
 {
 	string name;
-	int value;
 } Shader;
+
+typedef struct
+{
+	string name;
+} Illumination;
 
 typedef struct
 {

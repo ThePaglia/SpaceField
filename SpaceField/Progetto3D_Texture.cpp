@@ -14,8 +14,6 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
-// Inizializzazione Booleano per la visualizzazione dell'ancora
-bool visualizzaAncora = FALSE;
 int last_mouse_pos_Y;
 int last_mouse_pos_X;
 bool moving_trackball = 0;
@@ -28,6 +26,7 @@ string stringa_asse;
 string Operazione;
 vector<Material> materials;
 vector<Shader> shaders;
+vector<Illumination> illuminations;
 LightShaderUniform light_unif = {};
 vector<MeshObj> Model3D;
 vector<vector<MeshObj>> ScenaObj;
@@ -37,14 +36,14 @@ int h_up = height;
 mat4 Projection_text;
 mat4 rotation_matrix = mat4(1.0);
 
-unsigned int programId, programId1, programIdr, programId_text, MatrixProj, MatrixProj_txt, MatModel, MatView, locSceltaVs, loctime, MatViewS, MatrixProjS;
-unsigned int loc_view_pos, locSceltaFs, VAO_Text, VBO_Text, loc_texture, loc_texture1;
+unsigned int programId, programId1, programIdr, programId_text, MatrixProj, MatrixProj_txt, MatModel, MatView, locSceltaVs, locIllumination, loctime, MatViewS, MatrixProjS;
+unsigned int loc_view_pos, VAO_Text, VBO_Text, loc_texture;
 int idTex, texture, texture1, texture2, cubemapTexture;
 unsigned int MatModelR, MatViewR, MatrixProjR, loc_view_posR, loc_cubemapR;
 float raggio_sfera = 2.5;
 vec3 asse = vec3(0.0, 1.0, 0.0);
 int selected_obj = 0;
-float cameraSpeed = 0.1;
+float cameraSpeed = 1.0;
 vector<Mesh> Scena, Snowman;
 point_light light;
 
@@ -72,12 +71,12 @@ void inizilizzaCubemap()
 			"bottom.jpg",
 			"front.jpg",
 			"back.jpg"*/
-		SkyboxDir + "posx.jpg",
-		SkyboxDir + "negx.jpg",
-		SkyboxDir + "posy.jpg",
-		SkyboxDir + "negy.jpg",
-		SkyboxDir + "posz.jpg",
-		SkyboxDir + "negz.jpg" };
+		SkyboxDir + "space_right1.png",
+		SkyboxDir + "space_left2.png",
+		SkyboxDir + "space_top3.png",
+		SkyboxDir + "space_bottom4.png",
+		SkyboxDir + "space_front5.png",
+		SkyboxDir + "space_back6.png" };
 	cubemapTexture = loadCubemap(faces, 0);
 }
 // loads a cubemap texture from 6 individual texture faces
@@ -90,12 +89,11 @@ void inizilizzaCubemap()
 // -Z (back)
 //
 void resize(int w, int h)
-{
+{	//TODO: capire perché tama fa solo glutReshapeWindow(width, height) ma fa questo in drawScene
 	// Imposto la matrice di Proiezione per il rendering del testo
-
 	Projection_text = ortho(0.0f, (float)width, 0.0f, (float)height);
 
-	// Imposto la matrice di proiezione per la scena da diegnare
+	// Imposto la matrice di proiezione per la scena da disegnare
 	Projection = perspective(radians(SetupProspettiva.fovY), SetupProspettiva.aspect, SetupProspettiva.near_plane, SetupProspettiva.far_plane);
 
 	float AspectRatio_mondo = (float)(width) / (float)(height); // Rapporto larghezza altezza di tutto ci� che � nel mondo
@@ -118,33 +116,29 @@ void resize(int w, int h)
 
 void main_menu_func(int option)
 {
-	switch (option)
-	{
-	case MenuOption::WIRE_FRAME:
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		break;
-	case MenuOption::FACE_FILL:
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		break;
-
-	default:
-		break;
-	}
 	glutPostRedisplay();
 }
 
 void material_menu_function(int option)
 {
-	if (selected_obj > -1)
+	if (selected_obj > -1) {
 		Scena[selected_obj].material = (MaterialType)option;
+	}
 	glutPostRedisplay();
 }
 
 void shader_menu_function(int option)
 {
-	if (selected_obj > -1)
-		Scena[selected_obj].sceltaVS = shaders[option].value;
+	if (selected_obj > -1) {
+		Scena[selected_obj].shader = (ShaderType)option;
+	}
+	glutPostRedisplay();
+}
 
+void illumination_menu_function(int option) {
+	if (selected_obj > -1) {
+		Scena[selected_obj].illumination = (IlluminationType)option;
+	}
 	glutPostRedisplay();
 }
 
@@ -158,20 +152,23 @@ void buildOpenGLMenu()
 	glutAddMenuEntry(materials[MaterialType::YELLOW].name.c_str(), MaterialType::YELLOW);
 
 	int shaderSubMenu = glutCreateMenu(shader_menu_function);
-	glutAddMenuEntry(shaders[ShaderOption::NONE].name.c_str(), ShaderOption::NONE);
-	glutAddMenuEntry(shaders[ShaderOption::GOURAD_SHADING].name.c_str(), ShaderOption::GOURAD_SHADING);
-	glutAddMenuEntry(shaders[ShaderOption::PHONG_SHADING].name.c_str(), ShaderOption::PHONG_SHADING);
-	glutAddMenuEntry(shaders[ShaderOption::NO_TEXTURE].name.c_str(), ShaderOption::NO_TEXTURE);
-	glutAddMenuEntry(shaders[ShaderOption::WAVE].name.c_str(), ShaderOption::WAVE);
+	glutAddMenuEntry(shaders[ShaderType::NO_SHADER].name.c_str(), ShaderType::NO_SHADER);
+	glutAddMenuEntry(shaders[ShaderType::TEXTURE].name.c_str(), ShaderType::TEXTURE);
+	glutAddMenuEntry(shaders[ShaderType::PHONG_SHADING].name.c_str(), ShaderType::PHONG_SHADING);
+	glutAddMenuEntry(shaders[ShaderType::INTERPOLATE_SHADING].name.c_str(), ShaderType::INTERPOLATE_SHADING);
+
+	int illuminationSubMenu = glutCreateMenu(illumination_menu_function);
+	glutAddMenuEntry(illuminations[IlluminationType::NO_ILLUMINATION].name.c_str(), IlluminationType::NO_ILLUMINATION);
+	glutAddMenuEntry(illuminations[IlluminationType::PHONG].name.c_str(), IlluminationType::PHONG);
+	glutAddMenuEntry(illuminations[IlluminationType::BLINN].name.c_str(), IlluminationType::BLINN);
 
 	glutCreateMenu(main_menu_func);	 // richiama main_menu_func() alla selezione di una voce menu
-	glutAddMenuEntry("Opzioni", -1); //-1 significa che non si vuole gestire questa riga
+	glutAddMenuEntry("Options", -1);
 	glutAddMenuEntry("", -1);
-	glutAddMenuEntry("Wireframe", MenuOption::WIRE_FRAME);
-	glutAddMenuEntry("Face fill", MenuOption::FACE_FILL);
 	glutAddSubMenu("Material", materialSubMenu);
 	glutAddSubMenu("Shader", shaderSubMenu);
-	glutAttachMenu(GLUT_MIDDLE_BUTTON);
+	glutAddSubMenu("Illumination", illuminationSubMenu);
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 void drawScene(void)
@@ -203,7 +200,7 @@ void drawScene(void)
 	glBindVertexArray(0);
 	glDepthMask(GL_TRUE);
 
-	glUseProgram(programIdr);
+	glUseProgram(programId);
 	// Utilizzo il program shader per il disegno
 	glUniformMatrix4fv(MatrixProjR, 1, GL_FALSE, value_ptr(Projection));
 	glUniformMatrix4fv(MatModelR, 1, GL_FALSE, value_ptr(Scena[1].Model));
@@ -230,58 +227,35 @@ void drawScene(void)
 	glUniform3f(loc_view_pos, SetupTelecamera.position.x, SetupTelecamera.position.y, SetupTelecamera.position.z);
 	glUniform1f(loctime, time);
 
-	for (int k = 0; k < Scena.size(); k++)
+	for (int k = 1; k < Scena.size(); k++)
 	{
 		// Trasformazione delle coordinate dell'ancora dal sistema di riferimento dell'oggetto in sistema
 		// di riferimento del mondo premoltiplicando per la matrice di Modellazione.
-
 		Scena[k].ancora_world = Scena[k].ancora_obj;
 		Scena[k].ancora_world = Scena[k].Model * Scena[k].ancora_world;
+
+		glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[k].Model));
 		// Passo al Vertex Shader il puntatore alla matrice Model dell'oggetto k-esimo della Scena, che sar� associata alla variabile Uniform mat4 Projection
 		// all'interno del Vertex shader. Uso l'identificatio MatModel
-		glUniform1i(locSceltaVs, Scena[k].sceltaVS);
+		glUniform1i(locSceltaVs, Scena[k].shader);
+		glUniform1i(locIllumination, Scena[k].illumination);
 
 		glUniform3fv(light_unif.material_ambient, 1, glm::value_ptr(materials[Scena[k].material].ambient));
 		glUniform3fv(light_unif.material_diffuse, 1, glm::value_ptr(materials[Scena[k].material].diffuse));
 		glUniform3fv(light_unif.material_specular, 1, glm::value_ptr(materials[Scena[k].material].specular));
 		glUniform1f(light_unif.material_shininess, materials[Scena[k].material].shininess);
-		glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[k].Model));
 		glBindVertexArray(Scena[k].VAO);
 
-		if (visualizzaAncora == TRUE)
-		{
-			// Visualizzo l'ancora dell'oggetto
-			int ind = Scena[k].indici.size() - 1;
-
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT, BUFFER_OFFSET(ind * sizeof(GLuint)));
+		if (Scena[k].sceltaVS != 0) {
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, Scena[k].sceltaVS);
+			glUniform1i(loc_texture, 1);
 		}
-		// Mixare pi� texture su uno stesso pixel
-		/*
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
-
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture1);
-
-		glUniform1i(loc_texture, 0);
-		glUniform1i(loc_texture1, 1);
-		*/
-
-		if (k < Scena.size() - 1)
-		{
-			glUniform1i(loc_texture, 0);
-			glBindTexture(GL_TEXTURE_2D, texture1);
+		else {
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
-
-		else
-		{
-			glUniform1i(loc_texture, 0);
-			glBindTexture(GL_TEXTURE_2D, texture);
-		}
-
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDrawElements(GL_TRIANGLES, (Scena[k].indici.size() - 1) * sizeof(GLuint), GL_UNSIGNED_INT, 0);
-
 		glBindVertexArray(0);
 	}
 
@@ -293,6 +267,7 @@ void drawScene(void)
 		{
 			glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(ScenaObj[j][k].ModelM));
 			glUniform1i(locSceltaVs, ScenaObj[j][k].sceltaVS);
+			glUniform1i(locIllumination, ScenaObj[j][k].illumination);
 			// Passo allo shader il puntatore ai materiali
 
 			glUniform3fv(light_unif.material_ambient, 1, value_ptr(ScenaObj[j][k].materiale.ambient));
@@ -307,22 +282,17 @@ void drawScene(void)
 		}
 	}
 	// Imposto il renderizzatore del testo
-
-	RenderText(programId_text, Projection_text, Operazione, VAO_Text, VBO_Text, 50.0f, 650.0f, 0.5f, glm::vec3(1.0, 0.0f, 0.2f));
-
-	RenderText(programId_text, Projection_text, stringa_asse, VAO_Text, VBO_Text, 50.0f, 700.0f, 0.5f, glm::vec3(1.0, 0.0f, 0.2f));
-
-	RenderText(programId_text, Projection_text, "Oggetto selezionato", VAO_Text, VBO_Text, 80.0f, 750.0f, 0.5f, glm::vec3(1.0, 0.0f, 0.2f));
-
-	if (selected_obj > -1)
-		RenderText(programId_text, Projection_text, Scena[selected_obj].nome.c_str(), VAO_Text, VBO_Text, 120.0f, 700.0f, 0.5f, glm::vec3(1.0, 0.0f, 0.2f));
-
+	if (selected_obj > -1) {
+		RenderText(programId_text, Projection_text, "Nome: " + Scena[selected_obj].nome, VAO_Text, VBO_Text, 20.0f, 770.0f, 0.5f, vec3(1.0f, 1.0f, 1.0f));
+		RenderText(programId_text, Projection_text, "Material: " + materials[Scena[selected_obj].material].name, VAO_Text, VBO_Text, 20.0f, 750.0f, 0.5f, vec3(1.0f, 1.0f, 1.0f));
+		RenderText(programId_text, Projection_text, "Shader: " + shaders[Scena[selected_obj].shader].name, VAO_Text, VBO_Text, 20.0f, 730.0f, 0.5f, vec3(1.0f, 1.0f, 1.0f));
+		RenderText(programId_text, Projection_text, "Illumination: " + illuminations[Scena[selected_obj].illumination].name, VAO_Text, VBO_Text, 20.0f, 710.0f, 0.5f, vec3(1.0f, 1.0f, 1.0f));
+	}
 	glutSwapBuffers();
 }
 
 void update(int value)
 {
-	angolo = angolo + 1;
 	glutTimerFunc(200, update, 0);
 	glutPostRedisplay();
 }
@@ -339,13 +309,12 @@ int main(int argc, char* argv[])
 
 	glutInitWindowSize(width, height);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("Scena 3D");
+	glutCreateWindow("Space Field");
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(resize);
 
 	glutMouseFunc(mouse);
 	glutKeyboardFunc(keyboardPressedEvent);
-	glutKeyboardUpFunc(keyboardReleasedEvent);
 	glutTimerFunc(200, update, 0);
 	glutPassiveMotionFunc(my_passive_mouse);
 	glutMotionFunc(mouseActiveMotion);
@@ -379,11 +348,10 @@ int main(int argc, char* argv[])
 	MatView = glGetUniformLocation(programId, "View");
 
 	locSceltaVs = glGetUniformLocation(programId, "sceltaVS");
-	locSceltaFs = glGetUniformLocation(programId, "sceltaFS");
+	locIllumination = glGetUniformLocation(programId, "illumination");
 	loctime = glGetUniformLocation(programId, "time");
 	loc_view_pos = glGetUniformLocation(programId, "ViewPos");
 	loc_texture = glGetUniformLocation(programId, "id_tex");
-	loc_texture1 = glGetUniformLocation(programId, "id_tex1");
 
 	light_unif.light_position_pointer = glGetUniformLocation(programId, "light.position");
 	light_unif.light_color_pointer = glGetUniformLocation(programId, "light.color");

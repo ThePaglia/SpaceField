@@ -4,7 +4,6 @@
 #include "Gestione_VAO.h"
 #include "GestioneTelecamera.h"
 #include "enum.h"
-extern bool visualizzaAncora;
 extern int cont_cubi, cont_pir;
 extern vector<Mesh> Scena;
 extern string stringa_asse, Operazione;
@@ -55,8 +54,8 @@ void keyboardPressedEvent(unsigned char key, int x, int y)
 		moveCameraBack();
 		break;
 
-	case 'v': // Visualizzazione ancora
-		visualizzaAncora = TRUE;
+	case 32:
+		moveCameraUp();
 		break;
 
 	case 'g': // Si entra in modalit� di operazione traslazione
@@ -141,21 +140,6 @@ void keyboardPressedEvent(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
-void keyboardReleasedEvent(unsigned char key, int x, int y)
-{
-	{
-		switch (key)
-		{
-		case 'v':
-			visualizzaAncora = FALSE;
-			break;
-		default:
-			break;
-		}
-	}
-	glutPostRedisplay();
-}
-
 vec3 get_ray_from_mouse(float mouse_x, float mouse_y)
 {
 	mouse_y = height - mouse_y;
@@ -193,8 +177,6 @@ bool ray_sphere(vec3 O, vec3 d, vec3 sphere_centre_wor, float sphere_radius, flo
 
 	float delta = b * b - cc;
 
-	if (delta < 0) // Il raggio non interseca la sfera
-		return false;
 	// Calcolo i valori di t per cui il raggio interseca la sfera e restituisco il valore dell'intersezione
 	// pi� vicina all'osservatore (la t pi� piccola)
 	if (delta > 0.0f)
@@ -205,21 +187,21 @@ bool ray_sphere(vec3 O, vec3 d, vec3 sphere_centre_wor, float sphere_radius, flo
 		*intersection_distance = t_b;
 
 		// Caso di intersezioni dietro l'osservatore
-		if (t_a < 0.0)
+		if (t_a < 0.0f && t_b < 0.0f)
 		{
-			if (t_b < 0)
-				return false;
+			return false;
 		}
 
 		return true;
 	}
 	// Caso in cui il raggio � tangente alla sfera: un interesezione con molteplicit� doppia.
-	if (delta == 0)
+	else if (delta == 0)
 	{
 		float t = -b + sqrt(delta);
-		if (t < 0)
-			return false;
 		*intersection_distance = t;
+		if (t < 0) {
+			return false;
+		}
 		return true;
 	}
 
@@ -230,43 +212,21 @@ void mouse(int button, int state, int x, int y)
 {
 	switch (button)
 	{
-		// Con il tasto sinistro premuto si attiva la modalit� di trackball
 	case GLUT_LEFT_BUTTON:
+		// Con il tasto sinistro si selezionano gli oggetti nella scena
 		if (state == GLUT_DOWN)
 		{
-			moving_trackball = true;
-		}
-		if (state == GLUT_UP)
-		{
-			moving_trackball = false;
-		}
-		// OperationMode = NAVIGATION;
-		last_mouse_pos_X = x;
-		last_mouse_pos_Y = y;
-		break;
-
-	case GLUT_RIGHT_BUTTON:
-
-		// Con il tasto destro si selezionano gli oggetti nella scena
-		if (state == GLUT_DOWN && glutGetModifiers() == GLUT_ACTIVE_CTRL)
-		{
-			float xmouse = x;
-			float ymouse = y;
-			vec3 ray_wor = get_ray_from_mouse(xmouse, ymouse);
-
+			vec3 ray_wor = get_ray_from_mouse((float)x, (float)y);
 			selected_obj = -1;
 			float closest_intersection = 0.0f;
 			for (int i = 0; i < Scena.size(); i++)
 			{
 				float t_dist = 0.0f;
-
-				if (ray_sphere(SetupTelecamera.position, ray_wor, Scena[i].ancora_world, raggio_sfera, &t_dist))
+				if (ray_sphere(SetupTelecamera.position, ray_wor, Scena[i].ancora_world, raggio_sfera, &t_dist)
+					&& (selected_obj == -1 || t_dist < closest_intersection))
 				{
-					if (selected_obj == -1 || t_dist < closest_intersection)
-					{
-						selected_obj = i;
-						closest_intersection = t_dist;
-					}
+					selected_obj = i;
+					closest_intersection = t_dist;
 				}
 			}
 			if (selected_obj > -1)
