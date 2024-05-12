@@ -75,10 +75,11 @@ void createObjectFromObj(vector<MeshObj> Model3D, string nome, int nmeshes, vec3
 		vec3 ambiental = Model3D[i].materiale.ambient;
 		vec3 difusivo = Model3D[i].materiale.diffuse;
 		vec3 speculare = Model3D[i].materiale.specular;
+		float shininess = Model3D[i].materiale.shininess;
 		Model3D[i].materiale.ambient = ambiental;
 		Model3D[i].materiale.diffuse = difusivo;
 		Model3D[i].materiale.specular = speculare;
-		Model3D[i].materiale.shininess = red_plastic_shininess;
+		Model3D[i].materiale.shininess = shininess;
 	}
 	// Inserisco il modello nella scena
 	ScenaObj.push_back(Model3D);
@@ -100,6 +101,59 @@ void INIT_VAO(void)
 	oggetto.shader = ShaderType::NO_SHADER;
 	oggetto.material = MaterialType::NO_MATERIAL;
 	oggetto.illumination = IlluminationType::NO_ILLUMINATION;
+	Scena.push_back(oggetto);
+	clearObject(oggetto);
+
+	// 4 Sfere per mostrare i diversi tipi di illuminazione e shader
+	// Sfera 1
+	crea_sfera(&oggetto, vec4(1.0, 0.0, 1.0, 1.0));
+	crea_VAO_Vector(&oggetto);
+	oggetto.Model = mat4(1.0);
+	oggetto.Model = translate(oggetto.Model, vec3(-6.0, 0.0, 100.0));
+	oggetto.Model = scale(oggetto.Model, vec3(5.0, 5.0, 5.0));
+	oggetto.nome = "Interpolate Shading - Phong Illumination";
+	oggetto.shader = ShaderType::INTERPOLATE_SHADING;
+	oggetto.illumination = IlluminationType::PHONG;
+	oggetto.material = MaterialType::EMERALD;
+	Scena.push_back(oggetto);
+	clearObject(oggetto);
+
+	// Sfera 2
+	crea_sfera(&oggetto, vec4(1.0, 0.0, 1.0, 1.0));
+	crea_VAO_Vector(&oggetto);
+	oggetto.Model = mat4(1.0);
+	oggetto.Model = translate(oggetto.Model, vec3(-18.0, 0.0, 100.0));
+	oggetto.Model = scale(oggetto.Model, vec3(5.0, 5.0, 5.0));
+	oggetto.nome = "Interpolate Shading - Blinn-Phong Illumination";
+	oggetto.shader = ShaderType::INTERPOLATE_SHADING;
+	oggetto.illumination = IlluminationType::BLINN;
+	oggetto.material = MaterialType::EMERALD;
+	Scena.push_back(oggetto);
+	clearObject(oggetto);
+
+	// Sfera 3
+	crea_sfera(&oggetto, vec4(1.0, 0.0, 1.0, 1.0));
+	crea_VAO_Vector(&oggetto);
+	oggetto.Model = mat4(1.0);
+	oggetto.Model = translate(oggetto.Model, vec3(6.0, 0.0, 100.0));
+	oggetto.Model = scale(oggetto.Model, vec3(5.0, 5.0, 5.0));
+	oggetto.nome = "Phong Shading - Phong Illumination";
+	oggetto.shader = ShaderType::PHONG_SHADING;
+	oggetto.illumination = IlluminationType::PHONG;
+	oggetto.material = MaterialType::EMERALD;
+	Scena.push_back(oggetto);
+	clearObject(oggetto);
+
+	// Sfera 4
+	crea_sfera(&oggetto, vec4(1.0, 0.0, 1.0, 1.0));
+	crea_VAO_Vector(&oggetto);
+	oggetto.Model = mat4(1.0);
+	oggetto.Model = translate(oggetto.Model, vec3(18.0, 0.0, 100.0));
+	oggetto.Model = scale(oggetto.Model, vec3(5.0, 5.0, 5.0));
+	oggetto.nome = "Phong Shading - Blinn-Phong Illumination";
+	oggetto.shader = ShaderType::PHONG_SHADING;
+	oggetto.illumination = IlluminationType::BLINN;
+	oggetto.material = MaterialType::EMERALD;
 	Scena.push_back(oggetto);
 	clearObject(oggetto);
 
@@ -134,11 +188,11 @@ void INIT_VAO(void)
 	clearObject(oggetto);
 
 	// Star Destroyer
-	name = "star wars star destroyer.obj";
+	name = "starDestroyer.obj";
 	path = Meshdir + "/starDestroyer/" + name;
 	obj = loadAssImp(path.c_str(), Model3D);
 	nmeshes = Model3D.size();
-	createObjectFromObj(Model3D, "Star Destroyer", nmeshes, vec3(70.0, -200.0, 250.0), vec3(0.5, 0.5, 0.5), 0.0, vec3(0.0, 0.0, 0.0));
+	createObjectFromObj(Model3D, "Star Destroyer", nmeshes, vec3(70.0, 0.0, 250.0), vec3(0.5, 0.5, 0.5), 0.0, vec3(0.0, 0.0, 0.0));
 	Model3D.clear();
 }
 
@@ -160,14 +214,12 @@ void INIT_VAO_Text(void)
 void INIT_CAMERA_PROJECTION(void)
 {
 	// Imposto la telecamera
-
-	SetupTelecamera.position = glm::vec4(0.0, 0.5, 100.0, 0.0);
+	SetupTelecamera.position = glm::vec4(0.0, 0.5, 150.0, 0.0);
 	SetupTelecamera.target = glm::vec4(0.0, 0.0, 0.0, 0.0);
 	SetupTelecamera.direction = SetupTelecamera.target - SetupTelecamera.position;
 	SetupTelecamera.upVector = glm::vec4(0.0, 1.0, 0.0, 0.0);
 
 	// Imposto la proiezione prospettica
-
 	SetupProspettiva.aspect = (GLfloat)width / (GLfloat)height;
 	SetupProspettiva.fovY = 45.0f;
 	SetupProspettiva.far_plane = 2000.0f;
@@ -176,7 +228,7 @@ void INIT_CAMERA_PROJECTION(void)
 
 void INIT_Illuminazione()
 {
-	light.position = { 0.0, 1.0, 0.0 };
+	light.position = { 1.0, 1.0, 1.0 };
 	light.color = { 1.0, 1.0, 1.0 };
 	light.power = 1.0f;
 

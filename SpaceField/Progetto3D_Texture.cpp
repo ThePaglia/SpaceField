@@ -89,7 +89,7 @@ void inizilizzaCubemap()
 // -Z (back)
 //
 void resize(int w, int h)
-{	//TODO: capire perché tama fa solo glutReshapeWindow(width, height) ma fa questo in drawScene
+{
 	// Imposto la matrice di Proiezione per il rendering del testo
 	Projection_text = ortho(0.0f, (float)width, 0.0f, (float)height);
 
@@ -164,7 +164,6 @@ void buildOpenGLMenu()
 
 	glutCreateMenu(main_menu_func);	 // richiama main_menu_func() alla selezione di una voce menu
 	glutAddMenuEntry("Options", -1);
-	glutAddMenuEntry("", -1);
 	glutAddSubMenu("Material", materialSubMenu);
 	glutAddSubMenu("Shader", shaderSubMenu);
 	glutAddSubMenu("Illumination", illuminationSubMenu);
