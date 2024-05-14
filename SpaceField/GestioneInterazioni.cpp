@@ -19,6 +19,7 @@ extern bool clickObject, moving_trackball;
 extern int last_mouse_pos_X, last_mouse_pos_Y;
 extern ViewSetup SetupTelecamera;
 extern mat4 rotation_matrix;
+
 void modifyModelMatrix(vec3 translation_vector, vec3 rotation_vector, GLfloat angle, GLfloat scale_factor)
 {
 	// ricordare che mat4(1) costruisce una matrice identit� di ordine 4
@@ -32,6 +33,7 @@ void modifyModelMatrix(vec3 translation_vector, vec3 rotation_vector, GLfloat an
 
 	glutPostRedisplay();
 }
+
 void keyboardPressedEvent(unsigned char key, int x, int y)
 {
 	char* intStr;

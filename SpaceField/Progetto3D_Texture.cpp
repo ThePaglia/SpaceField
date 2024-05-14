@@ -113,7 +113,7 @@ void resize(int w, int h)
 		h_up = (float)h;
 	}
 }
-
+// Crea il menu per la scelta dei materiali, shader e illuminazione
 void main_menu_func(int option)
 {
 	glutPostRedisplay();

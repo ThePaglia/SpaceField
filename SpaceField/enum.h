@@ -6,6 +6,7 @@ enum
 	ROTATING,
 	SCALING
 } OperationMode;
+
 enum
 {
 	X,

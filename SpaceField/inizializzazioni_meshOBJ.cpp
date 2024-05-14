@@ -47,7 +47,7 @@ void INIT_SHADER(void)
 
 	programIdr = ShaderMaker::createProgram(vertexShader, fragmentShader);
 }
-
+// Clear the object
 void clearObject(Mesh& oggetto) {
 	oggetto.vertici.clear();
 	oggetto.colori.clear();
@@ -56,7 +56,7 @@ void clearObject(Mesh& oggetto) {
 	oggetto.texCoords.clear();
 	oggetto.sceltaVS = 0;
 }
-
+// Crea l'oggetto dal file obj
 void createObjectFromObj(vector<MeshObj> Model3D, string nome, int nmeshes, vec3 posizione, vec3 scala, float rad, vec3 rotation) {
 	// Per ogni mesh dell'oggetto 3D creo un modello
 	for (int i = 0; i < nmeshes; i++) {
@@ -75,11 +75,12 @@ void createObjectFromObj(vector<MeshObj> Model3D, string nome, int nmeshes, vec3
 		vec3 ambiental = Model3D[i].materiale.ambient;
 		vec3 difusivo = Model3D[i].materiale.diffuse;
 		vec3 speculare = Model3D[i].materiale.specular;
-		float shininess = Model3D[i].materiale.shininess;
 		Model3D[i].materiale.ambient = ambiental;
 		Model3D[i].materiale.diffuse = difusivo;
 		Model3D[i].materiale.specular = speculare;
-		Model3D[i].materiale.shininess = shininess;
+		Model3D[i].materiale.shininess = red_plastic_shininess;
+		// Imposto lo shader
+		Model3D[i].sceltaVS = 3;
 	}
 	// Inserisco il modello nella scena
 	ScenaObj.push_back(Model3D);
@@ -104,7 +105,8 @@ void INIT_VAO(void)
 	Scena.push_back(oggetto);
 	clearObject(oggetto);
 
-	// 4 Sfere per mostrare i diversi tipi di illuminazione e shader
+	// 4 Sfere per mostrare i diversi tipi di illuminazione e shader in tutte le combinazioni
+
 	// Sfera 1
 	crea_sfera(&oggetto, vec4(1.0, 0.0, 1.0, 1.0));
 	crea_VAO_Vector(&oggetto);
@@ -192,7 +194,7 @@ void INIT_VAO(void)
 	path = Meshdir + "/starDestroyer/" + name;
 	obj = loadAssImp(path.c_str(), Model3D);
 	nmeshes = Model3D.size();
-	createObjectFromObj(Model3D, "Star Destroyer", nmeshes, vec3(70.0, 0.0, 250.0), vec3(0.5, 0.5, 0.5), 0.0, vec3(0.0, 0.0, 0.0));
+	createObjectFromObj(Model3D, "Star Destroyer", nmeshes, vec3(200.0, -50.0, 150.0), vec3(0.5, 0.5, 0.5), 180.0, vec3(-0.3, 1.0, -0.1));
 	Model3D.clear();
 }
 
